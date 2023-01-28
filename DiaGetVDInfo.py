@@ -8,14 +8,14 @@ import comtypes
 import comtypes.client
 
 # this has to be before the import that follows
-msdia = comtypes.client.GetModule(r'C:\Program Files (x86)\Common Files\Microsoft Shared\VC\amd64\msdia80.dll')
+msdia = comtypes.client.GetModule(r"msdia140.dll")
 
 from comtypes.gen.Dia2Lib import *
 
 try:
     dia = comtypes.client.CreateObject(msdia.DiaSource)
 except Exception as exc:
-    print("Exception creating DIA object: %s\nTry to regsrv32.dll msdia90.dll" % (str(exc)))
+    print("Exception creating DIA object: %s\nTry to regsrv32.dll msdia140.dll" % (str(exc)))
     sys.exit(1)
 
 
@@ -207,11 +207,16 @@ def GUIDToStr(guidbytes):
 def printGuidSym(symName):
     print("%s: %s" % (symName, GUIDToStr(symMap[symName].readData())))
 
-printGuidSym("IID_IVirtualDesktopManagerInternal")
-printGuidSym("IID_IVirtualDesktop")
-printGuidSym("IID_IVirtualDesktopManager")
-printGuidSym("IID_IVirtualDesktopPinnedApps")
+#printGuidSym("IID_IVirtualDesktopManagerInternal")
+#printGuidSym("IID_IVirtualDesktop")
+#printGuidSym("IID_IVirtualDesktopManager")
+#printGuidSym("IID_IVirtualDesktopPinnedApps")
+#printGuidSym("IID_IVirtualDesktopNotification")
+#printGuidSym("IID_IVirtualDesktopNotificationService")
 
+for (k, _) in symMap.items():
+    if "IID_IVirtualDesktop" in k:
+        printGuidSym(k)
 
 # In[8]:
 
@@ -231,7 +236,11 @@ def dumpVFT(vftName):
 
 #symMap['??_7CVirtualDesktopManager@@6BIVirtualDesktopManagerInternal@@@'].pe
 
-dumpVFT('??_7CVirtualDesktopManager@@6BIVirtualDesktopManagerInternal@@@')
+for (k, _) in symMap.items():
+    if "??_7CVirtualDesktop" in k:
+        dumpVFT(k)
+
+#dumpVFT('??_7CVirtualDesktopManager@@6BIVirtualDesktopManagerInternal@@@')
 dumpVFT('??_7VirtualDesktopsApi@@6B@')
 
 
