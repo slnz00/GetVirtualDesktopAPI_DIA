@@ -18,6 +18,9 @@ class Dumper:
         self.pe_files = pe_files
         self.symbol_map = self._get_symbol_map()
 
+        if self.output == Dumper.Output.FILE:
+            self._empty_dump_file()
+
     def guid(self, sym_name):
         guid = self.symbol_map[sym_name].read_data()
 
@@ -33,7 +36,7 @@ class Dumper:
 
         self._flush_output([
             "[%s] Virtual Desktop API dump - %s\n" % (date_string, self.name)
-        ])
+        ], False)
 
     def vftable(self, name, sym_name):
         vft_sym = self.symbol_map[sym_name]
@@ -64,9 +67,11 @@ class Dumper:
             *[int.from_bytes(guid[i:i + 1], 'little') for i in range(8, 16)]
         )
 
-    def _flush_output(self, lines):
+    def _flush_output(self, lines, new_line=True):
         if self.output == Dumper.Output.FILE:
             with open(self.file_path, 'a') as f:
+                if new_line:
+                    f.write('\n')
                 f.write('\n'.join(lines))
 
         elif self.output == Dumper.Output.CONSOLE:
@@ -82,3 +87,7 @@ class Dumper:
             all_symbols = all_symbols + pe.symbols
 
         return {c.name: c for c in all_symbols}
+
+    def _empty_dump_file(self):
+        with open(self.file_path, 'w') as f:
+            pass
