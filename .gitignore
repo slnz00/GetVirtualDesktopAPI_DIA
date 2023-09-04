@@ -1,5 +1,5 @@
 pdb/*
 !pdb/.gitkeep
-result/*
-!result/.gitkeep
 .idea
+__pycache__
+.ipynb_checkpoints
