@@ -3,7 +3,6 @@ import pefile
 import requests
 import comtypes
 import comtypes.client
-import sys
 
 PATH_DIR_SOURCE = os.path.dirname(os.path.abspath(__file__))
 PATH_DIR_PDB = os.path.join(PATH_DIR_SOURCE, '../..', 'pdb')
@@ -23,7 +22,7 @@ class PEFile(pefile.PE):
         try:
             return comtypes.client.CreateObject(msdia.DiaSource)
         except Exception as exc:
-            print('Failed creating DIA object, try to run"regsvr32 msdia80.dll"')
+            print('Failed creating DIA object, try to run as administrator: "regsvr32 %s"' % PATH_MSDIA)
             raise exc
 
     def __init__(self, path):
