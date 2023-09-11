@@ -22,7 +22,7 @@ class PEFile(pefile.PE):
         try:
             return comtypes.client.CreateObject(msdia.DiaSource)
         except Exception as exc:
-            print('Failed creating DIA object, try to run as administrator: "regsvr32 %s"' % PATH_MSDIA)
+            print(f'Failed creating DIA object, try to run as administrator: "regsvr32 {PATH_MSDIA}"')
             raise exc
 
     def __init__(self, path):
@@ -44,16 +44,22 @@ class PEFile(pefile.PE):
         pdb_url = self.pdb_url
 
         # download pdb file
-        if not os.path.exists(pdb_path):
+        if not os.path.exists(pdb_path) or os.path.getsize(pdb_path) == 0:
+            response = requests.get(pdb_url)
+
+            if response.status_code != 200:
+                print(f'Failed to download pdb file (status: {response.status_code}): {pdb_url}')
+                raise
+
             with open(pdb_path, 'wb') as f:
-                f.write(requests.get(URL_SYMBOLS_SERVER + pdb_url).content)
+                f.write(response.content)
 
         try:
             dia = PEFile.create_dia()
-            dia.loadDataFromPdb(self.pdb_path)
+            dia.loadDataFromPdb(pdb_path)
             return dia.openSession()
         except Exception as exc:
-            print(('[!] loadDataFromPdb() error %s' % (str(exc))))
+            print(f'Failed to load pdb file: {str(exc)}')
             raise
 
     def _get_symbols(self):
@@ -95,7 +101,7 @@ class PEFile(pefile.PE):
             if hasattr(debug_entry, 'PdbFileName'):
                 pdb_file = debug_entry.PdbFileName[:-1].decode('ascii')
                 pdb_filename = f'{pdb_file[:-4]}-{self.version}.pdb'
-                url = f'/{pdb_file}/{debug_entry.Signature_String}/{pdb_file}'
+                url = f'{URL_SYMBOLS_SERVER}/{pdb_file}/{debug_entry.Signature_String}/{pdb_file}'
                 return url, pdb_filename
 
         return None
