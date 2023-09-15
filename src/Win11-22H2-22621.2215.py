@@ -1,5 +1,5 @@
-from src.components.PEFile import PEFile
-from src.components.Dumper import Dumper
+from components.PEFile import PEFile
+from components.Dumper import Dumper
 
 twinuipcshell = PEFile(r"C:\Windows\System32\twinui.pcshell.dll")
 actxprxy = PEFile(r"C:\Windows\System32\actxprxy.dll")

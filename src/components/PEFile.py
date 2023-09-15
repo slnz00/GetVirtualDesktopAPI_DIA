@@ -13,7 +13,7 @@ URL_SYMBOLS_SERVER = 'https://msdl.microsoft.com/download/symbols'
 msdia = comtypes.client.GetModule(PATH_MSDIA)
 
 from comtypes.gen.Dia2Lib import *
-from src.components.PDBSymbol import PDBSymbol
+from PDBSymbol import PDBSymbol
 
 
 class PEFile(pefile.PE):
